@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elasticsearch Search</title>
+</head>
+<body>
+    <h1>Elasticsearch Search</h1>
+    <form action="/search" method="post">
+        <label for="search_term">Search Term:</label>
+        <input type="text" id="search_term" name="search_term" required>
+        <button type="submit">Search</button>
+    </form>
+    
+    {% if search_term %}
+        <h2>Search Results for "{{ search_term }}"</h2>
+        <ul>
+            {% for result in results %}
+                <li>{{ result._source.content }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>
