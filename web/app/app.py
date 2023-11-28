@@ -1,29 +1,38 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import requests
 import json
 
 app = Flask(__name__)
 
-ELASTICSEARCH_URL = "http://localhost:9200"
-INDEX_NAME = "test_data"
+ELASTICSEARCH_URL = "http://host.docker.internal:9200"
+INDEX_NAME = "law_test_data"
 
-print("hello")
 
 @app.route('/')
 def index():
-    print("hello4")
     return render_template('index.html')
 
 
 @app.route('/search', methods=['POST'])
 def search():
-    print("hello 2")
     search_term = request.form['search_term']
     results = perform_elasticsearch_search(search_term)
-    print(results)
-    return "hello3"
+    
     return render_template('index.html', results=results, search_term=search_term)
 
+@app.route('/health')
+def health():
+    response = requests.get("http://host.docker.internal:9200/_cluster/health")
+    # Check if the request was successful (status code 200)
+    if response.status_code == 200:
+        # Parse the JSON content
+        json_content = response.json()
+
+        # Return the JSON content as a response
+        return jsonify(json_content)
+    else:
+        # If the request was not successful, return an error response
+        return jsonify({"error": f"Request failed with status code {response.status_code}"})
 
 def perform_elasticsearch_search(search_term):
     print("search_term")
@@ -37,7 +46,6 @@ def perform_elasticsearch_search(search_term):
     }
     headers = {'Content-Type': 'application/json'}
     response = requests.get(search_url, headers=headers, data=json.dumps(query))
-    return {"key":"value"}
     results = response.json().get('hits', {}).get('hits', [])
     return results
 
