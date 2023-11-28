@@ -64,6 +64,7 @@ services:
       - es01
       - es02
       - kibana
+
 volumes:
   data01:
     driver: local
